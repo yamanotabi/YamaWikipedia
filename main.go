@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 type Mountain struct {
@@ -17,10 +19,15 @@ type Mountain struct {
 var (
 	mountains = map[int]Mountain{}
 	seq       = 0
+	db        *leveldb.DB
 )
 
 func main() {
 	e := echo.New()
+
+	// open db
+	db, _ = leveldb.OpenFile("./db", nil)
+	defer db.Close()
 
 	initRouting(e)
 
@@ -33,25 +40,39 @@ func initRouting(e *echo.Echo) {
 }
 
 func HandleAPIGetMountain(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
+	jsonBytes, err := db.Get([]byte(c.Param("id")), nil)
 	if err != nil {
-		return fmt.Errorf("errors when id convert to int: %s", c.Param("id"))
+		return fmt.Errorf("Get Data error:", err)
 	}
-	return c.JSON(http.StatusOK, mountains[id])
+	mountain := new(Mountain)
+	err = json.Unmarshal(jsonBytes, mountain)
+	if err != nil {
+		return fmt.Errorf("JSON Unmarshal error:", err)
+	}
+	return c.JSON(http.StatusOK, mountain)
 }
 
 func HandleAPISetMountain(c echo.Context) error {
 	param := new(Mountain)
 	if err := c.Bind(param); err != nil {
-		return err
+		return fmt.Errorf("param bind error:", err)
 	}
 	mountain := Mountain{
 		ID:     seq,
 		Name:   param.Name,
 		Height: param.Height,
 	}
+	seqStr := strconv.Itoa(seq)
 
-	mountains[seq] = mountain
+	jsonBytes, err := json.Marshal(mountain)
+	if err != nil {
+		return fmt.Errorf("JSON Marshal error:", err)
+	}
+
+	err = db.Put([]byte(seqStr), jsonBytes, nil)
+	if err != nil {
+		return fmt.Errorf("Put Data error:", err)
+	}
 	seq++
 
 	return c.JSON(http.StatusOK, mountain)
