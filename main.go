@@ -8,16 +8,12 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/syndtr/goleveldb/leveldb"
+
+	"github.com/shiki-tak/YamaWikipedia/domain"
 )
 
-type Mountain struct {
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
-	Height int    `json:"height"`
-}
-
 var (
-	mountains = map[int]Mountain{}
+	mountains = map[int]domain.Mountain{}
 	seq       = 0
 	db        *leveldb.DB
 )
@@ -44,7 +40,7 @@ func HandleAPIGetMountain(c echo.Context) error {
 	if err != nil {
 		return fmt.Errorf("Get Data error:", err)
 	}
-	mountain := new(Mountain)
+	mountain := new(domain.Mountain)
 	err = json.Unmarshal(jsonBytes, mountain)
 	if err != nil {
 		return fmt.Errorf("JSON Unmarshal error:", err)
@@ -53,11 +49,11 @@ func HandleAPIGetMountain(c echo.Context) error {
 }
 
 func HandleAPISetMountain(c echo.Context) error {
-	param := new(Mountain)
+	param := new(domain.Mountain)
 	if err := c.Bind(param); err != nil {
 		return fmt.Errorf("param bind error:", err)
 	}
-	mountain := Mountain{
+	mountain := domain.Mountain{
 		ID:     seq,
 		Name:   param.Name,
 		Height: param.Height,
