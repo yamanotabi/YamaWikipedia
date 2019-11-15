@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	mountains = map[int]domain.Mountain{}
-	seq       = 0
-	db        *leveldb.DB
+	seq = 0
+	db  *leveldb.DB
 )
 
 func main() {
@@ -38,12 +37,12 @@ func initRouting(e *echo.Echo) {
 func HandleAPIGetMountain(c echo.Context) error {
 	jsonBytes, err := db.Get([]byte(c.Param("id")), nil)
 	if err != nil {
-		return fmt.Errorf("Get Data error:", err)
+		return fmt.Errorf("Get Data error:%s", err)
 	}
 	mountain := new(domain.Mountain)
 	err = json.Unmarshal(jsonBytes, mountain)
 	if err != nil {
-		return fmt.Errorf("JSON Unmarshal error:", err)
+		return fmt.Errorf("JSON Unmarshal error:%s", err)
 	}
 	return c.JSON(http.StatusOK, mountain)
 }
@@ -51,23 +50,28 @@ func HandleAPIGetMountain(c echo.Context) error {
 func HandleAPISetMountain(c echo.Context) error {
 	param := new(domain.Mountain)
 	if err := c.Bind(param); err != nil {
-		return fmt.Errorf("param bind error:", err)
+		return fmt.Errorf("param bind error:%s", err)
 	}
 	mountain := domain.Mountain{
-		ID:     seq,
-		Name:   param.Name,
-		Height: param.Height,
+		ID:            seq,
+		Name:          param.Name,
+		ReadingJP:     param.ReadingJP,
+		ReadingEN:     param.ReadingEN,
+		Height:        param.Height,
+		Location:      param.Location,
+		MountainRange: param.MountainRange,
+		Image:         param.Image,
 	}
 	seqStr := strconv.Itoa(seq)
 
 	jsonBytes, err := json.Marshal(mountain)
 	if err != nil {
-		return fmt.Errorf("JSON Marshal error:", err)
+		return fmt.Errorf("JSON Marshal error:%s", err)
 	}
 
 	err = db.Put([]byte(seqStr), jsonBytes, nil)
 	if err != nil {
-		return fmt.Errorf("Put Data error:", err)
+		return fmt.Errorf("Put Data error:%s", err)
 	}
 	seq++
 

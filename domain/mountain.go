@@ -6,7 +6,7 @@ type Mountain struct {
 	ReadingJP     string    `json:"reading_jp"`
 	ReadingEN     string    `json:"reading_en"`
 	Height        int       `json:"height"`
-	location      [2]string `json:"location"`
+	Location      [2]string `json:"location"`
 	MountainRange string    `json:"mountain_range"`
 	Image         string    `json:"image"`
 }
