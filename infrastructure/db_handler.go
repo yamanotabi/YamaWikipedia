@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/iterator"
 )
 
 type LevelDBHandler struct {
@@ -39,14 +40,6 @@ func (handler *LevelDBHandler) Get(key string, args ...interface{}) ([]byte, err
 	return jsonBytes, nil
 }
 
-// TODO: implement Scan
-func (handler *LevelDBHandler) Scan() [][]byte {
-	res := [][]byte{}
-	iter := handler.Conn.NewIterator(nil, nil)
-	for iter.Next() {
-		value := iter.Value()
-		res = append(res, value)
-	}
-
-	return res
+func (handler *LevelDBHandler) Scan() iterator.Iterator {
+	return handler.Conn.NewIterator(nil, nil)
 }

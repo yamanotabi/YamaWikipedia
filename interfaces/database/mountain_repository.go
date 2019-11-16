@@ -47,7 +47,19 @@ func (repo *MountainRepository) FindById(key string) (domain.Mountain, error) {
 	return *mountain, nil
 }
 
-// TODO: implement
 func (repo *MountainRepository) FindAll() (domain.Mountains, error) {
-	return domain.Mountains{}, nil
+	ｍountains := []domain.Mountain{}
+	iter := repo.Scan()
+	for iter.Next() {
+		m := new(domain.Mountain)
+		value := iter.Value()
+		err := json.Unmarshal(value, m)
+		if err != nil {
+			return nil, err
+		}
+
+		ｍountains = append(ｍountains, *m)
+	}
+
+	return ｍountains, nil
 }

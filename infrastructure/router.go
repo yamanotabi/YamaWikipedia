@@ -12,6 +12,7 @@ func Init() {
 
 	api := e.Group("/api")
 	api.GET("/v1/mountains/:id", func(c echo.Context) error { return mountainController.Show(c) })
+	api.GET("/v1/mountains", func(c echo.Context) error { return mountainController.Index(c) })
 	api.POST("/v1/mountains", func(c echo.Context) error { return mountainController.Create(c) })
 
 	e.Logger.Fatal(e.Start(":1313"))
