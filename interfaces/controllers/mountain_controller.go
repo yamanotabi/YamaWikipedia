@@ -25,8 +25,11 @@ func NewMountainController(levelDBhandler database.LevelDBHandler) *MountainCont
 
 func (controller *MountainController) Create(c echo.Context) error {
 	m := domain.Mountain{}
-	c.Bind(&m)
-	err := controller.Interactor.Add(m)
+	err := c.Bind(&m)
+	if err != nil {
+		return c.JSON(500, fmt.Errorf("api request error:%s", err))
+	}
+	err = controller.Interactor.Add(m)
 	if err != nil {
 		return c.JSON(500, fmt.Errorf("api request error:%s", err))
 	}

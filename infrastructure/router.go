@@ -6,9 +6,7 @@ import (
 	"github.com/shiki-tak/YamaWikipedia/interfaces/controllers"
 )
 
-var Router *echo.Echo
-
-func init() {
+func Init() {
 	e := echo.New()
 	mountainController := controllers.NewMountainController(NewLevelDBHandler())
 
@@ -16,5 +14,5 @@ func init() {
 	api.GET("/v1/mountains/:id", func(c echo.Context) error { return mountainController.Show(c) })
 	api.POST("/v1/mountains", func(c echo.Context) error { return mountainController.Create(c) })
 
-	Router = e
+	e.Logger.Fatal(e.Start(":1313"))
 }

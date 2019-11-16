@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	infrastructure.Router.Start(":1313")
+	infrastructure.Init()
 }
