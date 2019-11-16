@@ -10,3 +10,5 @@ type Mountain struct {
 	MountainRange string    `json:"mountain_range"`
 	Image         string    `json:"image"`
 }
+
+type Mountains []Mountain
